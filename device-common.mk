@@ -371,7 +371,8 @@ PRODUCT_SOONG_NAMESPACES += \
 
 # Shims
 PRODUCT_PACKAGES += \
-    libexynoscamera_shim
+    libexynoscamera_shim \
+    libui_camera_shim
 
 # Stagefright
 PRODUCT_PACKAGES += \

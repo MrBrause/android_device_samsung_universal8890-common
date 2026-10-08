@@ -93,4 +93,9 @@ sed -i "41,48d" $BLOB_ROOT/vendor/etc/init/wifi_sec.rc
 "${PATCHELF}" --replace-needed libvndsecril-client.so libsecril-client.so $BLOB_ROOT/vendor/lib/libwrappergps.so
 "${PATCHELF}" --replace-needed libvndsecril-client.so libsecril-client.so $BLOB_ROOT/vendor/lib64/libwrappergps.so
 
+# Camera: Android 14 ABI fix - redirect onto libui_camera_shim
+# (see device/samsung/universal8890-common/libshims/libui_camshim)
+"${PATCHELF}" --replace-needed libui.so libui_camera_shim.so $BLOB_ROOT/vendor/lib/libexynoscamera3.so
+sed -i "s/\x00_Znwj\x00/\x00camnw\x00/" $BLOB_ROOT/vendor/lib/libexynoscamera3.so
+
 "${MY_DIR}/setup-makefiles.sh"
