@@ -124,6 +124,16 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     disable_configstore
 
+# Dex
+# Keep app compilation off the big cores: less heat and lag after installs/updates
+PRODUCT_SYSTEM_PROPERTIES += \
+    dalvik.vm.dex2oat-cpu-set=0,1,2,3 \
+    dalvik.vm.dex2oat-threads=4 \
+    dalvik.vm.background-dex2oat-cpu-set=0,1,2,3 \
+    dalvik.vm.background-dex2oat-threads=2 \
+    dalvik.vm.boot-dex2oat-cpu-set=0,1,2,3,4,5,6,7 \
+    dalvik.vm.boot-dex2oat-threads=8
+
 # DRM
 PRODUCT_PACKAGES += \
     android.hardware.drm@1.0-impl:32 \
