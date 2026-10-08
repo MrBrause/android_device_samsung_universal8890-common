@@ -88,6 +88,31 @@ PRODUCT_PACKAGES += \
     camera.exynos5 \
     android.hardware.camera.provider@2.5-service
 
+# Camera HAL (Samsung blob) logs every buffer at I/D level; keep only W/E
+PRODUCT_SYSTEM_PROPERTIES += \
+    log.tag.ExynosCameraBufferManager=W \
+    log.tag.ExynosCameraMCPipe=W \
+    log.tag.ExynosCamera3=W \
+    log.tag.ExynosCameraNode=W \
+    log.tag.ExynosCameraPipe=W \
+    log.tag.ExynosCamera3FrameFactory=W \
+    log.tag.ExynosCamera3Parameters=W \
+    log.tag.ExynosCamera3FrameFactoryPreview=W \
+    log.tag.ExynosCamera3Interface=W \
+    log.tag.ExynosCameraPipeFlite=W \
+    log.tag.ExynosCamera3FrameReprocessingFactory=W \
+    log.tag.ExynosCameraFrameManager=W \
+    log.tag.ExynosCameraNodeJpegHAL=W \
+    log.tag.ExynosCameraPipeGSC=W \
+    log.tag.ExynosCameraStreamManager=W \
+    log.tag.ExynosCameraRequestManager=W \
+    log.tag.exynos-libhwjpeg=W
+
+# Camera blob (Android O) deletes RefBase objects (frames) explicitly;
+# libutils warns on every frame (~90 lines/s). Harmless with weak count 0.
+PRODUCT_SYSTEM_PROPERTIES += \
+    log.tag.RefBase=E
+
 PRODUCT_COPY_FILES += \
     $(COMMON_PATH)/configs/sysconfig/component-overrides.xml:$(TARGET_COPY_OUT_VENDOR)/etc/sysconfig/component-overrides.xml
 
