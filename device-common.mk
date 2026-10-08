@@ -75,6 +75,14 @@ PRODUCT_PACKAGES += \
     android.hardware.bluetooth@1.0-service \
     libbt-vendor
 
+# Kernel 3.18 has no eBPF: netbpfload loads nothing and netd would wait
+# forever on bpf.progs_loaded, hanging at boot. Tell netd the programs are
+# "loaded". Must be a system property (vendor_init can't set it under
+# SELinux), and do NOT set ro.kernel.ebpf.supported — UL's NetdUpdatable
+# treats it as "eBPF present" and re-hangs netd.
+PRODUCT_SYSTEM_PROPERTIES += \
+    bpf.progs_loaded=1
+
 # Camera
 PRODUCT_PACKAGES += \
     camera.exynos5 \
