@@ -407,7 +407,8 @@ PRODUCT_SOONG_NAMESPACES += \
 # Shims
 PRODUCT_PACKAGES += \
     libexynoscamera_shim \
-    libui_camera_shim
+    libui_camera_shim \
+    libarmnn_demangle_shim
 
 # Stagefright
 PRODUCT_PACKAGES += \

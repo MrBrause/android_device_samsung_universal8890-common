@@ -1,0 +1,6 @@
+cc_library_shared {
+    name: "libarmnn_demangle_shim",
+    srcs: ["demangle_shim.cpp"],
+    vendor: true,
+    compile_multilib: "both",
+}

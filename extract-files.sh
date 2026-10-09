@@ -98,4 +98,8 @@ sed -i "41,48d" $BLOB_ROOT/vendor/etc/init/wifi_sec.rc
 "${PATCHELF}" --replace-needed libui.so libui_camera_shim.so $BLOB_ROOT/vendor/lib/libexynoscamera3.so
 sed -i "s/\x00_Znwj\x00/\x00camnw\x00/" $BLOB_ROOT/vendor/lib/libexynoscamera3.so
 
+# ArmNN NNAPI HAL references __cxa_demangle, absent from the vendor libc++
+"${PATCHELF}" --add-needed libarmnn_demangle_shim.so \
+  $BLOB_ROOT/vendor/bin/hw/android.hardware.neuralnetworks@1.1-service-armnn
+
 "${MY_DIR}/setup-makefiles.sh"
