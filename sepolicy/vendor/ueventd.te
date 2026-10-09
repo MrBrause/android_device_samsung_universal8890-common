@@ -3,3 +3,6 @@
 allow ueventd emmcblk_device:blk_file { create getattr setattr };
 
 allow ueventd self:capability sys_nice;
+
+# the EFS symlink
+allow ueventd tmpfs:lnk_file read;

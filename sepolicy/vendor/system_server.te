@@ -59,3 +59,6 @@ get_prop(system_server, userspace_reboot_config_prop)
 unix_socket_connect(system_server, property, gpsd)
 
 get_prop(system_server, build_bootimage_prop)
+
+# Benign enumeration of an unlabeled vendor property; no functional need
+dontaudit system_server vendor_default_prop:file read;

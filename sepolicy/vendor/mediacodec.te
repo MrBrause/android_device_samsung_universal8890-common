@@ -9,3 +9,7 @@ allow mediacodec {
 }:file r_file_perms;
 
 get_prop(mediacodec vendor_omx_prop)
+
+# perf hints from the power HAL during decode
+allow mediacodec hal_power_hwservice:hwservice_manager find;
+binder_call(mediacodec, hal_power_default)

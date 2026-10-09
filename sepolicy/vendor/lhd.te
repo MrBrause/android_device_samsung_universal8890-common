@@ -18,3 +18,9 @@ allow lhd {
 allow lhd sysfs_sec_gps:lnk_file r_file_perms;
 allow lhd hal_system_suspend_service:service_manager find;
 dontaudit lhd system_data_file:dir search;
+
+# lhd talks to the network through netd (AGPS/SUPL); marks its sockets
+# via the fwmark socket
+net_domain(lhd)
+
+binder_use(lhd)

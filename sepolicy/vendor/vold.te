@@ -15,3 +15,5 @@ allow vold {
 }:file rw_file_perms;
 
 dontaudit vold hal_bootctl_hwservice:hwservice_manager find;
+
+allow vold sec_efs_file:dir r_dir_perms;

@@ -69,3 +69,6 @@ r_dir_file(rild, mediaserver);
 set_prop(rild, radio_prop)
 get_prop(rild, vendor_radio_prop)
 set_prop(rild, vendor_radio_prop)
+
+# reads an unlabeled default_prop
+get_prop(rild, default_prop)

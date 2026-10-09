@@ -43,3 +43,7 @@ allow kernel tmpfs:dir search;
 
 allow kernel kernel:capability chown;
 allow kernel self:capability { chown mknod sys_module};
+
+# early /dev node creation in devtmpfs
+allow kernel device:dir { add_name write };
+allow kernel device:blk_file { create setattr getattr };

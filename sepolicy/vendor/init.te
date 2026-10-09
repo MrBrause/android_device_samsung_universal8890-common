@@ -28,3 +28,9 @@ allow init fwk_sensor_hwservice:hwservice_manager find;
 allow init hidl_base_hwservice:hwservice_manager add;
 
 unix_socket_connect(init, property, rild)
+
+# vendor init.rc writes discard_max_bytes
+allow init sysfs_io_sched_tuneable:file w_file_perms;
+
+# by-name EFS symlink relabel
+allow init efs_block_device:lnk_file relabelto;

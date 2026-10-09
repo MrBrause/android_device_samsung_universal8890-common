@@ -34,3 +34,11 @@ set_prop(vendor_init, vendor_audio_prop)
 set_prop(vendor_init, vendor_hwc_prop)
 set_prop(vendor_init, tee_prop)
 set_prop(vendor_init, vendor_radio_prop)
+
+# GPS init triggers on gsm.sim.state / gsm.network.type
+get_prop(vendor_init, radio_prop)
+
+# the EFS symlink
+allow vendor_init tmpfs:lnk_file read;
+
+dontaudit vendor_init media_userdir_file:dir getattr;
