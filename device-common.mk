@@ -157,7 +157,13 @@ PRODUCT_PACKAGES += \
 
 # Fingerprint
 PRODUCT_PACKAGES += \
-    android.hardware.biometrics.fingerprint@2.3-service.samsung
+    android.hardware.biometrics.fingerprint-service.samsung
+# Samsung capacitive home-button sensor
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.vendor.fingerprint.type=home \
+    ro.vendor.fingerprint.force_calibrate=true \
+    ro.vendor.fingerprint.uses_percentage_samples=true
+#    ro.vendor.fingerprint.cancel_on_enroll_completion=true
 
 # FlipFlap
 PRODUCT_PACKAGES += \
