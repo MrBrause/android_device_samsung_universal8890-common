@@ -984,6 +984,10 @@ service watchdogd /sbin/watchdogd 10 20
     class core
     seclabel u:r:watchdogd:s0
 
+# Mount customer.xml depending on persist.sys.heroims.cs_only set by HeroImsBridge apk to mimic user-triggered disable of ims
+on property:persist.sys.heroims.cs_only=1
+       mount none /system/csc/customer_cs.xml /system/csc/customer.xml bind
+
 # on userdebug and eng builds, enable kgdb on the serial console
 on property:ro.debuggable=1
     write /sys/module/kgdboc/parameters/kgdboc ttyFIQ1
