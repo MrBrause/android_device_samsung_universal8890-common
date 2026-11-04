@@ -1,0 +1,23 @@
+# smdexe — Samsung shared-memory IPC daemon (sets up the modem SMD channels, e.g.
+# /dev/umts_router). Part of the jameskdev IMS bring-up. Like multiclientd/imsd before
+# round 1, it was running in init's domain (no transition) -> under enforcing init's domain
+# would NOT permit modem-node access, so smdexe would fail to open /dev/umts_router and the
+# modem IPC channel setup would break. Give it its own domain.
+#
+
+type smdexe, domain;
+type smdexe_exec, exec_type, file_type, system_file_type;
+
+# init execs /system/bin/smdexe -> transition into this domain.
+init_daemon_domain(smdexe)
+
+# Modem SMD channel node (/dev/umts_router and friends). ioctlcmd 5401 = TCGETS (benign).
+allow smdexe vendor_radio_device:chr_file { read write open ioctl };
+
+# smdexe is execed by init as root and drops to uid system -> CAP_SETUID.
+allow smdexe self:capability setuid;
+# Property reads.
+get_prop(smdexe, system_prop)
+get_prop(smdexe, default_prop)
+# WATCH under enforcing: if smdexe also drops its GID it will need self:capability setgid
+#   (not seen in permissive — the service .rc may set group=system instead). Add only if it fires.

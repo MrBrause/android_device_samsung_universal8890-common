@@ -1,0 +1,58 @@
+# multiclientd — Samsung OEM-IPC broker. It forwards OEM requests from clients
+# (the IMS engine, the audio HAL, gpsd, ...) to rild over binder, and authorizes
+# each client by /proc/<pid>/cmdline + SO_PEERCRED on its @Multiclient abstract socket.
+# It was running in init's domain (no transition) -> give it its own domain so the
+# device can run ENFORCING.
+#
+
+type multiclientd, domain;
+type multiclientd_exec, exec_type, file_type, system_file_type;
+
+# init execs /system/bin/multiclientd -> transition into this domain
+init_daemon_domain(multiclientd)
+
+# OEM-IPC over binder: multiclientd <-> rild, and reach (hw)servicemanager.
+binder_use(multiclientd)
+binder_call(multiclientd, rild)
+binder_call(rild, multiclientd)
+hwbinder_use(multiclientd)
+allow multiclientd hal_telephony_hwservice:hwservice_manager find;
+
+# Modem / radio char device node.
+allow multiclientd vendor_radio_device:chr_file { ioctl open read write };
+
+# The @Multiclient abstract server socket (now labeled u:r:multiclientd:s0).
+allow multiclientd self:unix_stream_socket create_stream_socket_perms;
+
+# OEM clients connect to @Multiclient. (system_app = the IMS engine com.sec.imsservice,
+# which runs as uid system; add more client domains here if enforcing reveals them.)
+allow { hal_audio_default gpsd rild system_app } multiclientd:unix_stream_socket connectto;
+
+# Whitelist check: multiclientd reads the connecting client's /proc/<pid>/cmdline.
+# (Not seen as a denial in permissive, but required by its design — pre-allow to avoid
+# a surprise under enforcing; trim if unused.)
+allow multiclientd { hal_audio_default gpsd rild system_app }:dir search;
+allow multiclientd { hal_audio_default gpsd rild system_app }:file { getattr open read };
+
+# ------------------------------------------------------------------------------------
+# ROUND 2 additions (permissive avc_dedup2, 2026-10-31) — all now correctly tagged u:r:multiclientd
+# ------------------------------------------------------------------------------------
+# Property reads.
+get_prop(multiclientd, default_prop)
+get_prop(multiclientd, hwservicemanager_prop)
+
+# multiclientd searches the telephony provider's data dir (radio_data_file). It descends
+# /data -> /data/user_de -> /data/user_de/0 -> .../com.android.providers.telephony, and the
+# first two of those are system_userdir_file -> it needs search on them too. (round 6/enforcing:
+# only surfaced under enforcing on an actual call, when the HwBinder worker walks to the leaf.)
+allow multiclientd radio_data_file:dir search;
+allow multiclientd system_userdir_file:dir search;
+
+# PRECONFG radio logging is LOAD-BEARING for the OEM path (confirmed 2026-11-01: denying it via
+# dontaudit silently broke call setup under enforcing — multiclientd's HwBinder worker execs
+# logcat and writes /data/log/radio_PRECONFG_SET.log while handling the radio-preconfig OEM cmd).
+allow multiclientd logcat_exec:file { execute execute_no_trans read open getattr };
+allow multiclientd logd:unix_stream_socket connectto;
+allow multiclientd logdr_socket:sock_file write;
+allow multiclientd system_data_file:dir { search read open write add_name };
+allow multiclientd system_data_file:file { create open read write append getattr setattr };

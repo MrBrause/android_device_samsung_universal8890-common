@@ -1,0 +1,21 @@
+# Samsung IMS engine <-> AOSP bridge: servicemanager label for "secims".
+#
+# com.sec.imsservice publishes a binder named "secims" to servicemanager in
+#   com.sec.ims.ImsCoreManager.addServiceToSystemServer()  (ImsService.onCreate)
+# and HeroImsBridge resolves it with ServiceManager.getService("secims").
+#
+# Both the engine app and HeroImsBridge run in the "system_app" domain
+# (platform-signed, sharedUserId=android.uid.system, no custom seapp domain),
+# so a single rule on system_app covers the publisher (add) and the client (find).
+#
+# Without this, servicemanager denies { add } -> ImsService.onCreate throws
+# SecurityException("SELinux denied.") -> com.sec.imsservice crash-loops.
+
+type secims_service, service_manager_type;
+
+# engine registers it; HeroImsBridge (also system_app) looks it up
+allow system_app   secims_service:service_manager { add find };
+
+# telephony stack in system_server (ImsResolver / ImsPhone) may resolve it too
+allow system_server secims_service:service_manager find;
+

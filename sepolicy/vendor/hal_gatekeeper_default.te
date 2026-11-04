@@ -4,3 +4,9 @@ allow hal_gatekeeper_default efs_file:dir search;
 
 allow hal_gatekeeper_default gatekeeper_efs_file:dir search;
 allow hal_gatekeeper_default gatekeeper_efs_file:file rw_file_perms;
+
+# gatekeeper stores the lock-screen credential in the TEE-backed EFS (/efs/TEE). Under enforcing it
+# needs to manage that dir; without write it can't save/update a PIN/pattern -> lock-screen + fingerprint
+# enrollment fail.
+allow hal_gatekeeper_default gatekeeper_efs_file:dir  rw_dir_perms;
+allow hal_gatekeeper_default gatekeeper_efs_file:file create_file_perms;

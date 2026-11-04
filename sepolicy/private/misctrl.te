@@ -1,0 +1,5 @@
+# Device addition to the platform misctrl domain: silence the benign ~1/sec getattr on the OTA
+# partition (/dev/block/sda7 = by-name OTA, vendor-labeled ota_block_device). misctrl is a platform
+# coredomain and ota_block_device is a vendor type, so it can't be allowed across the Treble boundary;
+# the stat is harmless (OTA here is via recovery/updater, not misctrl).
+dontaudit misctrl dev_type:blk_file getattr;

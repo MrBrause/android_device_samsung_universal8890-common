@@ -1,0 +1,27 @@
+# ims_engine.te — SELinux rules for the Samsung IMS ENGINE (com.sec.imsservice).
+#
+# The engine runs as a PRIVILEGED SYSTEM app (sharedUserId android.uid.system, platform-signed),
+# so at runtime it lands in the shared core domain u:r:system_app. There is no engine-specific
+# domain on this port, so its round-2 denials (avc_dedup2, 2026-10-31) are tagged u:r:system_app.
+#
+# CAVEAT (read this): every rule here widens ALL system-uid apps, not just the engine. The rules
+# below are narrow and low-risk (two property reads, own-proc_net read, one unix-socket client
+# path), so this is an acceptable pragmatic step to reach enforcing. The PROPER long-term fix is a
+# DEDICATED DOMAIN for the engine so these grants don't leak to every system app:
+#   seapp_contexts:  user=system seinfo=platform name=com.sec.imsservice domain=sec_ims_app type=system_app_data_file
+#   sec_ims_app.te:  type sec_ims_app, domain; app_domain(sec_ims_app) + the four rules below
+#                    retargeted to sec_ims_app, and multiclientd.te's client set updated
+#                    ({ ... system_app } -> add sec_ims_app). Deferred; note it with the ims commits.
+
+# Property reads.
+get_prop(system_app, vendor_default_prop)
+get_prop(system_app, vold_post_fs_data_prop)
+get_prop(system_app, net_dns_prop)        # engine reads the DNS property (round 3, avc_dedup3)
+get_prop(system_app, vendor_nfc_prop)     # engine reads the NFC vendor property (round 6, avc_dedup6)
+
+# The engine reads its OWN /proc/<pid>/net/if_inet6 to discover the IMS PDN IPv6 address.
+allow system_app proc_net:file { getattr open read };
+
+# The engine is a client of the imsd unix socket at /dev/socket/imsd.
+allow system_app imsd:unix_stream_socket connectto;
+allow system_app socket_device:sock_file write;

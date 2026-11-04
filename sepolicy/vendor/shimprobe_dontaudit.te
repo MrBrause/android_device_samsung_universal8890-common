@@ -1,0 +1,11 @@
+# Silence the benign LD-shim probe flood.
+# TARGET_LD_SHIM_LIBS (BoardConfig) makes the LOS linker inject shims into libexynoscamera.so and
+# libbauthserver.so. The linker consults the shim table in EVERY process at startup and read/getattr's
+# those target libs to wire the shim — so every domain (fsck, logd, apexd, ...) probes them even though
+# only cameraserver / the biometric HAL actually load them. Benign; the probe failing just means the
+# shim isn't wired in a process that never loads the lib anyway.
+#
+# The two libs are now labeled same_process_hal_file (file_contexts relabel). Real consumers keep their
+# own same_process_hal_file execute/read allows; this only suppresses the non-consumer probe noise.
+
+dontaudit domain same_process_hal_file:file { read getattr open map };

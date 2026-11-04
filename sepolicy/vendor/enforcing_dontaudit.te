@@ -1,0 +1,25 @@
+# enforcing_dontaudit.te — OPTIONAL. Silences the non-IMS enforcing denials that are app
+# overreach or cosmetic. These are all CORRECTLY denied (apps/GMS reaching at hardware, IMEI,
+# adb state, /data, etc.) — dontaudit just stops them spamming the audit log. It does NOT grant
+# access. Drop it if you'd rather keep them visible.
+# PLACEMENT: device/samsung/universal8890-common/sepolicy/vendor/enforcing_dontaudit.te
+
+# Apps poking sysfs hardware nodes and the EFS/IMEI partition — must stay denied.
+dontaudit untrusted_app sysfs:file read;
+dontaudit untrusted_app sysfs_battery:dir search;
+dontaudit untrusted_app sysfs_fingerprint:dir search;
+dontaudit untrusted_app efs_file:dir search;
+
+# GMS probing adb-state properties (adbd_prop / system_adbd_prop) — harmless. Those are
+# platform-PRIVATE property types, so they can't be named from vendor sepolicy; use the PUBLIC
+# 'property_type' attribute (every property type carries it) to dontaudit the reads.
+dontaudit gmscore_app property_type:file read;
+
+# bootanimation looking for a custom /data animation (falls back to the built-in one).
+dontaudit bootanim system_data_file:dir search;
+
+# kdevtmpfs tearing down dm-* nodes — kernel-internal.
+dontaudit kernel device:dir remove_name;
+
+# logpersist's logcat touching a vendor 'passwd' file — cosmetic.
+dontaudit logpersist vendor_file:file read;

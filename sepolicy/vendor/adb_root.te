@@ -1,0 +1,6 @@
+# ---- LOCAL DEV ONLY, do not commit ----
+# artifacts of the adb-root / debuggable / logpersist dirty commits
+set_prop(vendor_init, shell_prop)
+set_prop(vendor_init, userdebug_or_eng_prop)
+set_prop(vendor_init, system_prop)
+set_prop(vendor_init, logpersistd_logging_prop)

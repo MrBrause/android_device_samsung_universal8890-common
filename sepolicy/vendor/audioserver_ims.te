@@ -1,0 +1,10 @@
+# audioserver_ims.te — OPTIONAL. The two audioserver denials in avc_dedup2 are generic LOS/vendor
+# noise, NOT part of the IMS call path, but they will log under enforcing. Include only if you want
+# them silent. PLACEMENT: device/samsung/universal8890-common/sepolicy/vendor/.
+
+# audioserver reads a vendor property.
+get_prop(audioserver, vendor_default_prop)
+
+# audioserver stat's /system/vendor/lib64/libexynoscamera.so during lib enumeration — harmless,
+# just silence it (don't grant vendor_file read to audioserver without need).
+dontaudit audioserver vendor_file:file { read getattr };

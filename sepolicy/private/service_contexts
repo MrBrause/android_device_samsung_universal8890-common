@@ -1,0 +1,4 @@
+# Samsung IMS engine client binder. Must match the name passed to
+# ServiceManager.addService(...) in ImsCoreManager.addServiceToSystemServer().
+secims                                    u:object_r:secims_service:s0
+

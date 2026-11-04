@@ -1,0 +1,36 @@
+# imsd — Samsung IMS daemon. Like multiclientd it was running in init's domain, so
+# some of the "init" denials belonged to it. Now it has its own domain; the round-2
+# denials (avc_dedup2) are correctly tagged u:r:imsd and trimmed to what it actually needs.
+#
+
+type imsd, domain;
+type imsd_exec, exec_type, file_type, system_file_type;
+
+init_daemon_domain(imsd)
+
+# Radio/telephony over binder.
+binder_use(imsd)
+binder_call(imsd, rild)
+binder_call(rild, imsd)
+hwbinder_use(imsd)
+allow imsd hal_telephony_hwservice:hwservice_manager find;
+allow imsd vendor_radio_device:chr_file { ioctl open read write };
+
+# imsd talks to multiclientd's @Multiclient channel as a client.
+allow imsd multiclientd:unix_stream_socket connectto;
+
+# imsd's own unix sockets. The /dev/socket/imsd node is created by init (socket line in
+# imsd.rc) with imsd's label; the IMS engine connects to it (see ims_engine.te).
+allow imsd self:unix_stream_socket create_stream_socket_perms;
+
+# Property read.
+get_prop(imsd, default_prop)
+
+# IMS IPsec: imsd opens a PF_KEY (key-management) socket for the SIP security associations
+# (ESP SAs toward the P-CSCF). Only { create } was seen first; grant the usual PF_KEY set.
+allow imsd self:key_socket { create read write setopt getopt };
+# CAP_NET_ADMIN (capability 12): imsd installs the IPsec SAs / configures the IMS interface.
+# Seen in round 3 (avc_dedup3) once the socket path was unblocked — the xfrm side of the PF_KEY work.
+allow imsd self:capability net_admin;
+# WATCH under enforcing: a secured registration may further need netlink_xfrm_socket perms
+#   (allow imsd self:netlink_xfrm_socket ...). Add only if IMS IPsec breaks once enforcing.
