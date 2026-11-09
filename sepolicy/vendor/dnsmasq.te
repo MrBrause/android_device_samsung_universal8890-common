@@ -1,0 +1,9 @@
+# herolte (universal8890-common): dnsmasq (hotspot DHCP/DNS).
+#
+# dnsmasq reads the "group" file to resolve a group and DROP ROOT, running the
+# hotspot daemon at low privilege. Without this it can't complete the privilege
+# drop. Reading a world-readable config file is safe, so grant it rather than
+# just silencing the denial.
+#
+
+allow dnsmasq vendor_file:file r_file_perms;

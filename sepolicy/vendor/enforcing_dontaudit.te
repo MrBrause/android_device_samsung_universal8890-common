@@ -23,3 +23,11 @@ dontaudit kernel device:dir remove_name;
 
 # logpersist's logcat touching a vendor 'passwd' file — cosmetic.
 dontaudit logpersist vendor_file:file read;
+
+# tethering BPF-offload maps — offload can't run without clsact,
+# so the access is unusable; silence rather than grant.
+dontaudit network_stack fs_bpf:file { read write };
+
+# silence content_capture / isolated_app blockings
+# these are intentional sandbox boundaries
+dontaudit isolated_app content_capture_service:service_manager find;
