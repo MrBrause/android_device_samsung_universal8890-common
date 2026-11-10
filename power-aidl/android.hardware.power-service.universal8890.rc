@@ -1,0 +1,7 @@
+service vendor.power-default /vendor/bin/hw/android.hardware.power-service.universal8890
+    class hal
+    user system
+    group system
+    interface aidl android.hardware.power.IPower/default
+    # Needs no special caps; it only reads /sys/class/input and writes the
+    # touchscreen "enabled" nodes.

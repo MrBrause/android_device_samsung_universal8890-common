@@ -1,0 +1,27 @@
+// Minimal AIDL power HAL for universal8890 (touchscreen sleep on display off).
+//
+// Targets android.hardware.power V1 on purpose: V1 is the smallest surface
+// (setMode/isModeSupported/setBoost/isBoostSupported, no ADPF hint sessions),
+// and A13/A14's PowerManagerService talks to a V1 server fine. If the build or
+// VINTF rejects V1 (compatibility matrix wants a higher min version), bump the
+// -V1-ndk dep AND the <version> in the .xml together, and add stub overrides
+// for the extra methods the higher BnPower declares.
+
+cc_binary {
+    name: "android.hardware.power-service.universal8890",
+    relative_install_path: "hw",
+    vendor: true,
+    init_rc: ["android.hardware.power-service.universal8890.rc"],
+    vintf_fragments: ["android.hardware.power-service.universal8890.xml"],
+
+    srcs: [
+        "main.cpp",
+        "Power.cpp",
+    ],
+
+    shared_libs: [
+        "libbase",
+        "libbinder_ndk",
+        "android.hardware.power-V1-ndk",
+    ],
+}

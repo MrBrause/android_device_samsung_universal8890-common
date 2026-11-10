@@ -97,6 +97,11 @@
 /(vendor|system/vendor)/bin/hw/vendor\.lineage\.livedisplay@2\.1-service\.universal8890   u:object_r:hal_lineage_livedisplay_exynos_exec:s0
 
 ####################################
+# AIDL
+#
+/(vendor|system/vendor)/bin/hw/android\.hardware\.power-service\.universal8890            u:object_r:hal_power_default_exec:s0
+
+####################################
 # Same-process HAL files and their dependencies
 #
 

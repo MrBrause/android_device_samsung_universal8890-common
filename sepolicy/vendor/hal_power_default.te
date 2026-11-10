@@ -7,6 +7,7 @@ allow hal_power_default{
     sysfs_graphics
     sysfs_light
     sysfs_sec_tsp
+    sysfs_input
 }:dir r_dir_perms;
 
 allow hal_power_default{
@@ -19,9 +20,24 @@ allow hal_power_default{
     sysfs_sec_tsp
     sysfs_input
     sysfs_gpuclock
+    sysfs_input
 }:file rw_file_perms;
 
 allow hal_power_default sysfs_sec_tsp:lnk_file { read };
 
 # To get/set powerhal state property
 set_prop(hal_power_default, vendor_power_prop)
+
+# findTouchInputNodes() reads /sys/class/input/*/name to locate the
+# touchscreen; the kernel leaves those 'name' attributes plain 'sysfs'.
+allow hal_power_default sysfs:file r_file_perms;
+
+# The scan also walks sibling input devices we deliberately don't manage
+# (grip / heart-rate / hall / touchkey). Those dirs aren't searchable by
+# this domain and we don't want them to be — just silence the noise.
+dontaudit hal_power_default {
+    sysfs_grip
+    sysfs_hrm
+    sysfs_hall
+    sysfs_sec_touchkey
+}:dir search;
